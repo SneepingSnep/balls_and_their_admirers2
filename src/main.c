@@ -27,16 +27,10 @@ struct Ball {
   struct Ball *follows;
 };
 typedef struct Ball Ball;
-// Definition of Ball
-// Ball stores state and other properties
-// YOUR CODE HERE
+
 Ball balls[BALL_COUNT];
 
-// Initializes a ball with random values
 Ball *init_ball_random(Ball *p) {
-  // Randomly initialize state and properties
-  // YOUR CODE HERE
-
   p->color = COLORS[rand() % corlorsCount];
   p->posx = rand() % WIDTH;
   p->posy = rand() % HEIGHT;
@@ -44,16 +38,14 @@ Ball *init_ball_random(Ball *p) {
   p->velx = rand() % VEL_MAX;
   p->vely = rand() % VEL_MAX;
 
-  // Find a leading ball other than the initialized ball itself.
-  Ball *leader; // Represents the leading ball that this ball will follow
-                // YOUR CODE HERE
+  Ball *leader;
+
   leader = &balls[rand() % BALL_COUNT];
 
   p->follows = leader;
   return p;
 }
 
-// Initialize all `balls`
 void init_balls_random() {
   for (size_t count = 0; count < BALL_COUNT; count++) {
     Ball initball;
@@ -67,15 +59,12 @@ Ball *draw_ball(Ball *p) {
   return p;
 }
 
-// Updates the positions of balls according to their velocities
 Ball *update_pos(Ball *p) {
-  p->posx = (WIDTH + p->posx + p->velx) %
-            WIDTH; // `WIDTH +` because C uses truncated division
+  p->posx = (WIDTH + p->posx + p->velx) % WIDTH;
   p->posy = (HEIGHT + p->posy + p->vely) % HEIGHT;
   return p;
 }
 
-// Updates the velocity of a ball so that it follows the leading ball
 Ball *update_vel_for_following(Ball *p) {
   int errx = p->follows->posx - p->posx;
   int erry = p->follows->posy - p->posy;
@@ -84,7 +73,6 @@ Ball *update_vel_for_following(Ball *p) {
   return p;
 }
 
-// Update all elements
 void update_elements() {
   for (size_t i = 0; i < _countof(balls); ++i) {
     draw_ball(update_pos(update_vel_for_following(&balls[i])));
@@ -92,20 +80,14 @@ void update_elements() {
 }
 
 int main() {
-  // james.color = COLORS[1];
-  // Color color = COLORS[5];
-  // printf("%zu", _countof(balls));
-  // printf("%zu", _countof(COLORS));
+
   srand(time(NULL));
   // return 0;
   InitWindow(WIDTH, HEIGHT, TITLE);
   SetTargetFPS(FPS);
   init_balls_random();
-  // draw_ball(&biggieTheBlueBall);
-  //  draw_ball(init_ball_random(&biggieTheBlueBall));
 
-  while (!WindowShouldClose()) // Detect window close button or ESC key
-  {
+  while (!WindowShouldClose()) {
     BeginDrawing();
     update_elements();
     ClearBackground(RAYWHITE);
