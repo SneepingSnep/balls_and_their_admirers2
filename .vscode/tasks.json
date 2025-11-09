@@ -11,7 +11,7 @@
                 "-lgdi32",
                 "-lwinmm",
                 "-L../raylib/lib",
-                "./src/main.c",
+                "./src/mainwthrectangles.c",
                 "-o",
                 "main"
             ],

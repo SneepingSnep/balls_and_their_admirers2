@@ -8,7 +8,7 @@
 #define WIDTH 800
 #define HEIGHT 800
 #define TITLE "Balls and their admirers"
-#define BALL_COUNT 100
+#define BALL_COUNT 50
 #define FPS 60
 #define VEL_MAX 5
 #define RADIUS_MAX 30
@@ -21,7 +21,7 @@ Color COLORS[] = {
     DARKBLUE,  PURPLE, VIOLET,   DARKPURPLE, BEIGE,     BROWN,   DARKBROWN,
 };
 size_t corlorsCount = _countof(COLORS);
-
+size_t globalcountforballs = 0;
 struct Ball {
   int posx, posy, velx, vely;
   int radius;
@@ -47,9 +47,9 @@ struct figure {
   Shape shape;
 };
 
-Ball balls[BALL_COUNT / 2];
-Rectangleshape rectangles[BALL_COUNT / 2];
-struct figure figures[SHAPECOUNT];
+Ball balls[BALL_COUNT];
+Rectangleshape rectangles[BALL_COUNT];
+struct figure figuresshape[SHAPECOUNT];
 
 struct figure shape1 = {.type = 2};
 
@@ -68,26 +68,17 @@ struct figure *init_shape_random(struct figure *p, int shapenumber) {
     p->shape.rectangle.radius = (RADIUS_MAX - RADIUS_MIN + 1);
     p->shape.rectangle.velx = rand() % VEL_MAX;
     p->shape.rectangle.vely = rand() % VEL_MAX;
-    p->shape.rectangle.follows = &balls[rand() % BALL_COUNT];
+    int index;
+    do {
+      index = rand() % BALL_COUNT;
+    } while (figuresshape[index].type != ball);
+    p->shape.rectangle.follows = &figuresshape[index].shape.ball;
   }
-  //   p->color = COLORS[rand() % corlorsCount];
-  //   p->posx = rand() % WIDTH;
-  //   p->posy = rand() % HEIGHT;
-  //   p->radius = rand() % (RADIUS_MAX - RADIUS_MIN + 1);
-  //   p->velx = rand() % VEL_MAX;
-  //   p->vely = rand() % VEL_MAX;
-
-  //   struct figure *leader;
-
-  //   leader->shape.ball = balls[rand() % BALL_COUNT];
-
-  //   p->follows = leader;
   return p;
 }
 
 void init_balls_random() {
   int shapenumber;
-  int counterR = 0;
   int counterB = 0;
   for (size_t count = 0; count < BALL_COUNT; count++) {
     struct figure initshape;
@@ -95,21 +86,25 @@ void init_balls_random() {
       shapenumber = 0;
       initshape.type = 0;
       init_shape_random(&initshape, shapenumber);
-      figures[count] = initshape;
+      figuresshape[count] = initshape;
+      balls[counterB] = initshape.shape.ball;
+      counterB++;
 
     } else {
       shapenumber = 1;
       initshape.type = 1;
       init_shape_random(&initshape, shapenumber);
-      figures[count] = initshape;
+      figuresshape[count] = initshape;
     }
   }
 }
 
 struct figure *draw_shape(struct figure *p) {
   if (p->type == 0) {
+
     DrawCircle(p->shape.ball.posx, p->shape.ball.posy, p->shape.ball.radius,
                p->shape.ball.color);
+    globalcountforballs++;
   } else if (p->type == 1) {
     DrawRectangle(p->shape.rectangle.posx, p->shape.rectangle.posy,
                   p->shape.rectangle.radius, p->shape.rectangle.radius,
@@ -119,10 +114,13 @@ struct figure *draw_shape(struct figure *p) {
 }
 
 struct figure *update_pos(struct figure *p) {
-  p->shape.rectangle.posx =
-      (WIDTH + p->shape.rectangle.posx + p->shape.rectangle.velx) % WIDTH;
-  p->shape.rectangle.posy =
-      (HEIGHT + p->shape.rectangle.posy + p->shape.rectangle.vely) % HEIGHT;
+  if (p->type == 1) {
+    p->shape.rectangle.posx =
+        (WIDTH + p->shape.rectangle.posx + p->shape.rectangle.velx) % WIDTH;
+    p->shape.rectangle.posy =
+        (HEIGHT + p->shape.rectangle.posy + p->shape.rectangle.vely) % HEIGHT;
+  }
+
   return p;
 }
 
@@ -140,8 +138,8 @@ struct figure *update_vel_for_following(struct figure *p) {
 }
 
 void update_elements() {
-  for (size_t i = 0; i < _countof(balls) * 2; ++i) {
-    draw_shape(update_pos(update_vel_for_following(&figures[i])));
+  for (size_t i = 0; i < SHAPECOUNT; ++i) {
+    draw_shape(update_pos(update_vel_for_following(&figuresshape[i])));
   }
 }
 

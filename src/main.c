@@ -82,9 +82,10 @@ void update_elements() {
 int main() {
 
   srand(time(NULL));
-  // return 0;
+
   InitWindow(WIDTH, HEIGHT, TITLE);
   SetTargetFPS(FPS);
+
   init_balls_random();
 
   while (!WindowShouldClose()) {
